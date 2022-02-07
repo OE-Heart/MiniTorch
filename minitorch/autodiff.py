@@ -191,7 +191,7 @@ class History:
             list of numbers : a derivative with respect to `inputs`
         """
         # TODO: Implement for Task 1.4.
-        raise NotImplementedError('Need to implement for Task 1.4')
+        raise NotImplementedError("Need to implement for Task 1.4")
 
 
 class FunctionBase:
@@ -262,6 +262,7 @@ class FunctionBase:
         Implement the derivative chain-rule.
 
         Args:
+            cls (:class:`FunctionBase`): The Function
             ctx (:class:`Context`) : The context from running forward
             inputs (list of args) : The args that were passed to :func:`FunctionBase.apply` (e.g. :math:`x, y`)
             d_output (number) : The `d_output` value in the chain rule.
@@ -273,8 +274,12 @@ class FunctionBase:
         """
         # Tip: Note when implementing this function that
         # cls.backward may return either a value or a tuple.
-        # TODO: Implement for Task 1.3.
-        raise NotImplementedError('Need to implement for Task 1.3')
+        res = []
+        derivatives = wrap_tuple(cls.backward(ctx, d_output))
+        for input, deriv in zip(inputs, derivatives):
+            if not is_constant(input):
+                res.append((input, deriv))
+        return res
 
 
 # Algorithms for backpropagation
@@ -296,7 +301,7 @@ def topological_sort(variable):
                             starting from the right.
     """
     # TODO: Implement for Task 1.4.
-    raise NotImplementedError('Need to implement for Task 1.4')
+    raise NotImplementedError("Need to implement for Task 1.4")
 
 
 def backpropagate(variable, deriv):
@@ -313,4 +318,4 @@ def backpropagate(variable, deriv):
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
     # TODO: Implement for Task 1.4.
-    raise NotImplementedError('Need to implement for Task 1.4')
+    raise NotImplementedError("Need to implement for Task 1.4")
