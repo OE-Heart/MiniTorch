@@ -1,3 +1,6 @@
+import re
+
+
 variable_count = 1
 
 
@@ -190,8 +193,7 @@ class History:
         Returns:
             list of numbers : a derivative with respect to `inputs`
         """
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        return self.last_fn.chain_rule(self.ctx, self.inputs, d_output)
 
 
 class FunctionBase:
@@ -300,8 +302,22 @@ def topological_sort(variable):
         list of Variables : Non-constant Variables in topological order
                             starting from the right.
     """
-    # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    result = []
+    visited = set()
+
+    def DFS(variable):
+        if variable.unique_id in visited:
+            return
+        if not variable.is_leaf():
+            for input in variable.history.inputs:
+                if not is_constant(input):
+                    DFS(input)
+        visited.add(variable.unique_id)
+        result.append(variable)
+
+    DFS(variable)
+    result.reverse()
+    return result
 
 
 def backpropagate(variable, deriv):
@@ -317,5 +333,15 @@ def backpropagate(variable, deriv):
 
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
-    # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    topo = topological_sort(variable)
+    dict = {}
+    dict[variable.unique_id] = deriv
+    for var in topo:
+        if var.is_leaf():
+            var.accumulate_derivative(dict[var.unique_id])
+        else:
+            for v, d in var.history.backprop_step(dict[var.unique_id]):
+                if v.unique_id in dict.keys():
+                    dict[v.unique_id] += d
+                else:
+                    dict[v.unique_id] = d
