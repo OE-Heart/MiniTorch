@@ -1,5 +1,5 @@
 import random
-from .operators import prod
+from .operators import prod, zipWith, mul, sum
 from numpy import array, float64, ndarray
 import numba
 
@@ -24,8 +24,9 @@ def index_to_position(index, strides):
         int : position in storage
     """
 
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    if len(strides) != len(index):
+        raise IndexingError(f"Len of strides {strides} must match {index}.")
+    return sum(zipWith(mul)(index, strides))
 
 
 def to_index(ordinal, shape, out_index):
@@ -44,8 +45,12 @@ def to_index(ordinal, shape, out_index):
       None : Fills in `out_index`.
 
     """
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    if len(shape) != len(out_index):
+        raise IndexingError(f"Len of strides {shape} must match {out_index}.")
+    ord = ordinal
+    for i in range(len(shape)):
+        out_index[i] = ord % shape[i]
+        ord /= shape[i]
 
 
 def broadcast_index(big_index, big_shape, shape, out_index):
@@ -66,7 +71,7 @@ def broadcast_index(big_index, big_shape, shape, out_index):
         None : Fills in `out_index`.
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def shape_broadcast(shape1, shape2):
@@ -84,7 +89,7 @@ def shape_broadcast(shape1, shape2):
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def strides_from_shape(shape):
@@ -190,9 +195,12 @@ class TensorData:
         assert list(sorted(order)) == list(
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
-
-        # TODO: Implement for Task 2.1.
-        raise NotImplementedError('Need to implement for Task 2.1')
+        shape = []
+        strides = []
+        for i in range(len(order)):
+            shape.append(self._shape[order[i]])
+            strides.append(self.strides[order[i]])
+        return TensorData(self._storage, tuple(shape), tuple(strides))
 
     def to_string(self):
         s = ""
