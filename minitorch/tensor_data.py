@@ -1,4 +1,5 @@
 import random
+from turtle import shape
 from .operators import prod, zipWith, mul, sum
 from numpy import array, float64, ndarray
 import numba
@@ -70,8 +71,11 @@ def broadcast_index(big_index, big_shape, shape, out_index):
     Returns:
         None : Fills in `out_index`.
     """
-    # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    for i, s in enumerate(shape):
+        if s > 1:
+            out_index[i] = big_index[i + len(big_shape) - len(shape)]
+        else:
+            out_index[i] = 0
 
 
 def shape_broadcast(shape1, shape2):
@@ -88,8 +92,26 @@ def shape_broadcast(shape1, shape2):
     Raises:
         IndexingError : if cannot broadcast
     """
-    # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    shape = []
+    len1 = len(shape1)
+    len2 = len(shape2)
+    minLen = min(len1, len2)
+    for i in range(minLen):
+        if (
+            shape1[len1 - 1 - i] != shape2[len2 - 1 - i]
+            and min(shape1[len1 - 1 - i], shape2[len2 - 1 - i]) != 1
+        ):
+            raise IndexingError(f"Cannot broadcast at dimension {i}.")
+        shape.append(max(shape1[i], shape2[i]))
+
+    for i in range(len1 - minLen):
+        shape.append(shape1[len1 - minLen - 1 - i])
+
+    for i in range(len2 - minLen):
+        shape.append(shape2[len2 - minLen - 1 - i])
+
+    shape.reverse()
+    return tuple(shape)
 
 
 def strides_from_shape(shape):
